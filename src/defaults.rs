@@ -38,7 +38,7 @@ impl ToOctets for String {
         let mut dot_count = 0_u8;
         let mut buffer = "".to_owned();
         let return_default = || {
-            eprintln!("Conversion Failure: using default ASTRAL_ADDR");
+            eprintln!("ERR: ASTRAL_ADDR env var conversion failed, using default: `{:?}`.", ASTRAL_ADDR);
             return ASTRAL_ADDR;
         };
         for c in self.chars() {
