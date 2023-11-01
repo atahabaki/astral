@@ -1,3 +1,6 @@
+pub(crate) mod defaults;
+
+use defaults::get_defaults;
 use serde::{Serialize, Deserialize};
 use warp::Filter;
 
@@ -11,5 +14,5 @@ async fn main() {
     let search = warp::path("search")
         .and(warp::query::<SearchQuery>())
         .map(|sq: SearchQuery| format!("{}", sq.query));
-    warp::serve(search).run(([127, 0, 0, 1], 3000)).await;
+    warp::serve(search).run(get_defaults()).await;
 }
