@@ -1,4 +1,5 @@
-pub(crate) mod defaults;
+pub mod defaults;
+pub mod models;
 
 use defaults::get_defaults;
 use serde::{Serialize, Deserialize};
