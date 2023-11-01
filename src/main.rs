@@ -7,13 +7,13 @@ use warp::Filter;
 
 #[derive(Serialize, Deserialize)]
 struct SearchQuery {
-    query: String,
+    realm: String,
 }
 
 #[tokio::main]
 async fn main() {
-    let search = warp::path("search")
+    let search = warp::path("travel")
         .and(warp::query::<SearchQuery>())
-        .map(|sq: SearchQuery| format!("{}", sq.query));
+        .map(|sq: SearchQuery| format!("{}", sq.realm));
     warp::serve(search).run(get_defaults()).await;
 }

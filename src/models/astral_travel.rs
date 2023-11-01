@@ -22,7 +22,7 @@ impl Default for AstralTravel {
             realm_short_name: "ap".to_owned(),
             realm_full_name: "Astral Plane".to_owned(),
             settlement_uri: uri.clone(),
-            landing_uri: format!("{}/travel?destination={{%query%}}", uri),
+            landing_uri: format!("{}/travel?realm={{%query%}}", uri),
             landing_count: 0
         }
     }
