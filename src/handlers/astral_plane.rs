@@ -1,14 +1,15 @@
 use sqlx::PgPool;
 
-use crate::models::realm::*;
+use crate::models::{realm::*, xresponse::XResponse};
 
 pub async fn list_realms(pool: PgPool) -> Result<warp::reply::Json, warp::Rejection> {
     let planes = sqlx::query_as!(Realm, "SELECT * FROM astral_plane ORDER BY short_name")
         .fetch_all(&pool)
         .await;
     match planes {
-        Ok(realms) => Ok(warp::reply::json(&realms)),
-        Err(_) => Ok(warp::reply::json(&0)),
+        Ok(realms) =>
+            Ok(warp::reply::json(&XResponse::without_message(&realms))),
+        Err(e) => Ok(warp::reply::json(&XResponse::<Vec<Realm>>::without_data(&e))),
     }
 }
 
@@ -24,8 +25,8 @@ pub async fn get_realm(
     .fetch_one(&pool)
     .await;
     match plane {
-        Ok(realm) => Ok(warp::reply::json(&realm)),
-        Err(_) => Ok(warp::reply::json(&0)),
+        Ok(realm) => Ok(warp::reply::json(&XResponse::without_message(&realm))),
+        Err(e) => Ok(warp::reply::json(&XResponse::<Realm>::without_data(e))),
     }
 }
 
@@ -44,7 +45,7 @@ pub async fn create_realm(
     .fetch_one(&pool)
     .await;
     match sql_realm {
-        Ok(realm) => Ok(warp::reply::json(&realm)),
-        Err(_) => Ok(warp::reply::json(&0)),
+        Ok(realm) => Ok(warp::reply::json(&XResponse::without_message(&realm))),
+        Err(e) => Ok(warp::reply::json(&XResponse::<Realm>::without_data(&e))),
     }
 }
