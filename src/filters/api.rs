@@ -7,7 +7,7 @@ pub fn apis(
     pool: PgPool,
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
     warp::path("api")
-        .and(list_all(pool))
+        .and(planes(pool))
 }
 
 pub fn planes(
@@ -23,6 +23,7 @@ fn list_all(
 ) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
     warp::path("plane")
         .and(warp::get())
+        .and(warp::path::end())
         .and(with_pool(pool.clone()))
         .and_then(handlers::astral_plane::list_realms)
 }
