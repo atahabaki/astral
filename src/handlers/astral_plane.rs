@@ -1,50 +1,35 @@
-use sqlx::PgPool;
+use crate::{
+    daos::RealmDao,
+    models::{realm::*, xresponse::XResponse},
+};
 
-use crate::models::{realm::*, xresponse::XResponse};
-
-pub async fn list_realms(pool: PgPool) -> Result<warp::reply::Json, warp::Rejection> {
-    let planes = sqlx::query_as!(Realm, "SELECT * FROM astral_plane ORDER BY short_name")
-        .fetch_all(&pool)
-        .await;
-    match planes {
-        Ok(realms) =>
-            Ok(warp::reply::json(&XResponse::without_message(&realms))),
-        Err(e) => Ok(warp::reply::json(&XResponse::<Vec<Realm>>::without_data(&e))),
+pub async fn list_realms(dao: RealmDao) -> Result<warp::reply::Json, warp::Rejection> {
+    let realms = dao.list_all().await;
+    match realms {
+        Ok(realms) => Ok(warp::reply::json(&XResponse::without_message(&realms))),
+        Err(e) => Ok(warp::reply::json(&XResponse::<Vec<Realm>>::without_data(
+            &e,
+        ))),
     }
 }
 
 pub async fn get_realm(
-    pool: PgPool,
-    rs_name: String,
+    dao: RealmDao,
+    realm_short_name: String,
 ) -> Result<warp::reply::Json, warp::Rejection> {
-    let plane = sqlx::query_as!(
-        Realm,
-        "SELECT * FROM astral_plane WHERE short_name = $1",
-        rs_name
-    )
-    .fetch_one(&pool)
-    .await;
-    match plane {
+    let realm = dao.read(realm_short_name).await;
+    match realm {
         Ok(realm) => Ok(warp::reply::json(&XResponse::without_message(&realm))),
         Err(e) => Ok(warp::reply::json(&XResponse::<Realm>::without_data(e))),
     }
 }
 
 pub async fn create_realm(
-    pool: PgPool,
+    dao: RealmDao,
     realm: RealmCreate,
 ) -> Result<warp::reply::Json, warp::Rejection> {
-    let sql_realm = sqlx::query_as!(
-   Realm,
-   "INSERT INTO astral_plane (short_name, full_name, settlement_uri, landing_uri) VALUES ($1, $2, $3, $4) RETURNING *",
-   realm.short_name,
-   realm.full_name,
-   realm.settlement_uri,
-   realm.landing_uri
-   )
-    .fetch_one(&pool)
-    .await;
-    match sql_realm {
+    let creation = dao.create(realm).await;
+    match creation {
         Ok(realm) => Ok(warp::reply::json(&XResponse::without_message(&realm))),
         Err(e) => Ok(warp::reply::json(&XResponse::<Realm>::without_data(&e))),
     }

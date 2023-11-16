@@ -1,8 +1,10 @@
+pub mod daos;
 pub mod defaults;
 pub mod filters;
 pub mod handlers;
 pub mod models;
 
+use daos::RealmDao;
 use defaults::get_defaults;
 use sqlx::postgres::PgPoolOptions;
 use warp::Filter;
@@ -15,8 +17,9 @@ async fn main() {
         .connect(&db_url)
         .await
         .unwrap_or_else(|_| panic!("ERR: failed to connect to database."));
+    let realm_dao = RealmDao::new(pool);
     let traveler_asks = filters::traveler_asks();
-    let astral_planes = filters::api::apis(pool);
+    let astral_planes = filters::api::apis(realm_dao);
     let routes = traveler_asks.or(astral_planes);
     warp::serve(routes).run(get_defaults()).await;
 }
