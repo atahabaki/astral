@@ -3,14 +3,16 @@ pub mod api;
 use sqlx::PgPool;
 use warp::Filter;
 
-use crate::{daos::RealmDao, models::traveler_question::TravelerQuestion};
+use crate::{daos::RealmDao, handlers, models::shift::Shift};
 
-pub fn traveler_asks() -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone
-{
-    warp::path("travel")
+pub fn traveler_asks(
+    dao: RealmDao,
+) -> impl Filter<Extract = (impl warp::Reply,), Error = warp::Rejection> + Clone {
+    warp::path("shift")
         .and(warp::get())
-        .and(warp::query::<TravelerQuestion>())
-        .map(|tq: TravelerQuestion| format!("And, the traveler asked where is \"{}\"", tq.realm))
+        .and(warp::query::<Shift>())
+        .and(with_realm_dao(dao.clone()))
+        .and_then(handlers::give_directions)
 }
 
 pub fn with_realm_dao(

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
-pub struct TravelerQuestion {
-    pub realm: String,
+pub struct Shift {
+    pub to: String,
 }

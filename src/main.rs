@@ -18,7 +18,7 @@ async fn main() {
         .await
         .unwrap_or_else(|_| panic!("ERR: failed to connect to database."));
     let realm_dao = RealmDao::new(pool);
-    let traveler_asks = filters::traveler_asks();
+    let traveler_asks = filters::traveler_asks(realm_dao.clone());
     let astral_planes = filters::api::apis(realm_dao);
     let routes = traveler_asks.or(astral_planes);
     warp::serve(routes).run(get_defaults()).await;
